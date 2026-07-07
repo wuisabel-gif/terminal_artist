@@ -100,6 +100,7 @@ fn main() {
 }
 
 fn run(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
+    let svg = matches!(cli.output.as_ref(), Some(p) if p.extension().is_some_and(|e| e.eq_ignore_ascii_case("svg")));
     let opts = Options {
         width: cli.width,
         renderer: match cli.renderer {
@@ -112,9 +113,13 @@ fn run(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
             Color::Ansi256 => ColorMode::Ansi256,
             Color::Truecolor => ColorMode::TrueColor,
         },
-        char_aspect: cli
-            .char_aspect
-            .unwrap_or(if cli.glyphs == "moon" { 1.0 } else { 0.5 }),
+        // SVG cells are exactly 8.4×16 px → aspect 0.525 keeps proportions
+        // faithful; terminal cells vary, 0.5 is the common ratio.
+        char_aspect: cli.char_aspect.unwrap_or(match () {
+            _ if cli.glyphs == "moon" => 1.0,
+            _ if svg => 8.4 / 16.0,
+            _ => 0.5,
+        }),
         glyphs: glyphs::resolve(&cli.glyphs),
         invert: cli.invert,
         threshold: cli.threshold,
@@ -143,7 +148,6 @@ fn run(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let img = image::open(&cli.input)?;
-    let svg = matches!(cli.output.as_ref(), Some(p) if p.extension().is_some_and(|e| e.eq_ignore_ascii_case("svg")));
     // SVG carries color as per-glyph fills; use truecolor so parsing is exact.
     let render_opts = if svg && opts.color != ColorMode::None {
         Options { color: ColorMode::TrueColor, ..opts }

@@ -28,9 +28,9 @@ dithering, Braille bit-packing, and color mapping.
 </table>
 
 ```bash
-tartist dog.png     -w 160 -g density --invert --gamma 0.55 -a 0.45 -o dog.svg
+tartist dog.png     -w 160 -g density --invert --gamma 0.55 -o dog.svg
 tartist flower.png  -w 150 -g density -c truecolor -o flower.svg
-tartist charlie.png -w 90  -g " .:10" --invert --gamma 0.6 -a 0.62 -o charlie.svg
+tartist charlie.png -w 90  -g " .:10" --invert --gamma 0.6 -o charlie.svg
 ```
 
 Floyd–Steinberg dithering (on by default) turns smooth gradients into halftone
@@ -73,7 +73,7 @@ tartist loop.gif --once                  # just the first frame
 | `-r, --renderer` | `ascii` \| `half` \| `braille` | `ascii` |
 | `-c, --color` | `none` \| `ansi256` \| `truecolor` | `none` |
 | `-g, --glyphs` | preset (`standard`, `blocks`, `simple`, `binary`, `shaded`, `density`, `portrait`, `dots`, `detailed`, `moon`) or a custom dark→light string | `standard` |
-| `-a, --char-aspect` | font cell height/width ratio | `0.5` (`1.0` for `moon`) |
+| `-a, --char-aspect` | font cell height/width ratio | `0.5` terminal, `0.525` SVG export, `1.0` `moon` |
 | `-t, --threshold` | Braille dot on/off luminance cutoff (only with `--no-dither`) | `128` |
 | `--invert` | flip brightness→glyph mapping | off |
 | `--no-contrast` | disable the auto brightness stretch | off (stretch on) |
