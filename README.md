@@ -14,23 +14,23 @@ dithering, Braille bit-packing, and color mapping.
 <table>
 <tr><th>Original</th><th>Terminal art</th></tr>
 <tr>
-<td><img alt="puppy photo" src="dog.png" width="340"/></td>
-<td><img alt="ASCII art of the puppy" src="doc/dog_ascii.png" width="340"/></td>
+<td><img alt="puppy photo" src="demo/dog.png" width="340"/></td>
+<td><img alt="ASCII art of the puppy" src="demo/dog_ascii.png" width="340"/></td>
 </tr>
 <tr>
-<td><img alt="cosmos flower photo" src="flower.png.jpg" width="340"/></td>
-<td><img alt="ASCII art of the flower" src="doc/flower_ascii.png" width="340"/></td>
+<td><img alt="cosmos flower photo" src="demo/flower.jpg" width="340"/></td>
+<td><img alt="ASCII art of the flower" src="demo/flower_ascii.png" width="340"/></td>
 </tr>
 <tr>
-<td><img alt="Charlie Brown" src="charlie.png.jpg" width="340"/></td>
-<td><img alt="ASCII art of Charlie Brown" src="doc/charlie_ascii.png" width="340"/></td>
+<td><img alt="Charlie Brown" src="demo/charlie.jpg" width="340"/></td>
+<td><img alt="ASCII art of Charlie Brown" src="demo/charlie_ascii.png" width="340"/></td>
 </tr>
 </table>
 
 ```bash
-tartist dog.png     -w 160 -g density --invert --gamma 0.55 -o dog.svg
-tartist flower.png  -w 150 -g density -c truecolor -o flower.svg
-tartist charlie.png -w 90  -g " .:10" --invert --gamma 0.6 -o charlie.svg
+tartist demo/dog.png     -w 160 -g density --invert --gamma 0.55 -o dog.svg
+tartist demo/flower.jpg  -w 150 -g density -c truecolor -o flower.svg
+tartist demo/charlie.jpg -w 90  -g " .:10" --invert --gamma 0.6 -o charlie.svg
 ```
 
 Floyd–Steinberg dithering (on by default) turns smooth gradients into halftone
