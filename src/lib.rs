@@ -62,8 +62,8 @@ pub struct Options {
     /// `> 1.0` darkens them. `1.0` = no change.
     pub gamma: f32,
     /// Downscale by darkest-pixel instead of averaging — keeps thin dark
-    /// strokes solid. For cartoons, sketches, and line art.
-    pub line_art: bool,
+    /// strokes solid (cartoons, sketches). `None` = detect from the image.
+    pub line_art: Option<bool>,
 }
 
 impl Default for Options {
@@ -79,7 +79,7 @@ impl Default for Options {
             auto_contrast: true,
             dither: true,
             gamma: 1.0,
-            line_art: false,
+            line_art: None,
         }
     }
 }
@@ -245,10 +245,24 @@ fn min_pool(img: &DynamicImage, w: u32, h: u32) -> DynamicImage {
     DynamicImage::ImageRgba8(out)
 }
 
+/// Flat-color art detector: if the top 4 of 32 coarse luminance bins hold over
+/// 75% of pixels, the image is a few flat tones (cartoon, sketch, logo) — where
+/// averaging downscale would wash thin strokes out. Photos spread smoothly
+/// across bins and score far lower.
+fn is_line_art(img: &DynamicImage) -> bool {
+    let mut bins = [0u64; 32];
+    for (_, _, p) in img.pixels() {
+        bins[(luminance(p) / 8) as usize] += 1;
+    }
+    let total: u64 = bins.iter().sum();
+    bins.sort_unstable_by(|a, b| b.cmp(a));
+    total > 0 && (bins[..4].iter().sum::<u64>() as f32) / (total as f32) > 0.75
+}
+
 /// Pick the downscaler that matches the source: averaging for photos,
-/// darkest-pixel for line art.
+/// darkest-pixel for line art (auto-detected unless forced).
 fn downscale(img: &DynamicImage, w: u32, h: u32, opts: &Options) -> DynamicImage {
-    if opts.line_art {
+    if opts.line_art.unwrap_or_else(|| is_line_art(img)) {
         min_pool(img, w, h)
     } else {
         resize(img, w, h)
@@ -431,6 +445,37 @@ mod tests {
         };
         let out = render(&DynamicImage::ImageRgba8(im), &opts);
         assert!(out.starts_with('⣿')); // U+28FF, all 8 dots
+    }
+
+    #[test]
+    fn line_art_detected_and_thin_stroke_survives() {
+        // 64×64 white with a 2px black line: flat-color → auto min-pool →
+        // the stroke must stay solid at width 8 (averaging would grey it out).
+        let mut im = RgbaImage::new(64, 64);
+        for p in im.pixels_mut() {
+            *p = Rgba([255, 255, 255, 255]);
+        }
+        for x in 0..64 {
+            im.put_pixel(x, 32, Rgba([0, 0, 0, 255]));
+            im.put_pixel(x, 33, Rgba([0, 0, 0, 255]));
+        }
+        let img = DynamicImage::ImageRgba8(im);
+        assert!(is_line_art(&img));
+        let opts = Options { width: 8, char_aspect: 1.0, invert: true, ..Default::default() };
+        // Inverted: stroke → densest glyph '@' across the full row.
+        assert!(render(&img, &opts).lines().any(|l| l == "@@@@@@@@"));
+    }
+
+    #[test]
+    fn gradient_is_not_line_art() {
+        let mut im = RgbaImage::new(64, 64);
+        for y in 0..64 {
+            for x in 0..64 {
+                let v = (x * 4) as u8;
+                im.put_pixel(x, y, Rgba([v, v, v, 255]));
+            }
+        }
+        assert!(!is_line_art(&DynamicImage::ImageRgba8(im)));
     }
 
     #[test]
