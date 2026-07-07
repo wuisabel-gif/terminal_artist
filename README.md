@@ -17,11 +17,16 @@ A Rust library (`terminal_artist`) and CLI (`tartist`).
 <td><img alt="cosmos flower photo" src="flower.png.jpg" width="340"/></td>
 <td><img alt="ASCII art of the flower" src="doc/flower_ascii.png" width="340"/></td>
 </tr>
+<tr>
+<td><img alt="Charlie Brown" src="charlie.png.jpg" width="340"/></td>
+<td><img alt="ASCII art of Charlie Brown" src="doc/charlie_ascii.png" width="340"/></td>
+</tr>
 </table>
 
 ```bash
-tartist dog.png    -w 160 -g density --invert --gamma 0.55 -a 0.45 -o dog.svg
-tartist flower.png -w 150 -g density -c truecolor -o flower.svg
+tartist dog.png     -w 160 -g density --invert --gamma 0.55 -a 0.45 -o dog.svg
+tartist flower.png  -w 150 -g density -c truecolor -o flower.svg
+tartist charlie.png -w 74  -g " .013478T8B" --invert -o charlie.svg
 ```
 
 Floyd–Steinberg dithering (on by default) turns smooth gradients into halftone
