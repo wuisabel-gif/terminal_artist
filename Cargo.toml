@@ -1,0 +1,21 @@
+[package]
+name = "terminal_artist"
+version = "0.1.0"
+edition = "2021"
+description = "Render images and GIF animations as terminal art: ASCII, Unicode half-blocks, Braille, emoji, with ANSI color."
+license = "MIT"
+repository = "https://github.com/wuisabel-gif/terminal_artist"
+keywords = ["ascii", "terminal", "braille", "ansi", "image"]
+categories = ["command-line-utilities", "multimedia::images"]
+
+[[bin]]
+name = "tartist"
+path = "src/main.rs"
+
+[lib]
+name = "terminal_artist"
+path = "src/lib.rs"
+
+[dependencies]
+image = "0.25"
+clap = { version = "4", features = ["derive"] }
