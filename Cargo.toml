@@ -2,7 +2,7 @@
 name = "terminal_artist"
 version = "0.1.0"
 edition = "2021"
-description = "Render images and GIF animations as terminal art: ASCII, Unicode half-blocks, Braille, emoji, with ANSI color."
+description = "Render images and GIFs as ASCII art in Rust."
 license = "MIT"
 repository = "https://github.com/wuisabel-gif/terminal_artist"
 keywords = ["ascii", "terminal", "braille", "ansi", "image"]

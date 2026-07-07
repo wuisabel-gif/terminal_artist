@@ -1,7 +1,7 @@
 # Terminal Artist
 
-Render images and GIF animations as terminal art — ASCII/glyph ramps, Unicode
-half-blocks, Braille dot-matrix, and emoji, with optional ANSI 256 / truecolor.
+Render images and GIFs as ASCII art in Rust — plus Unicode half-blocks, Braille
+dot-matrix, and emoji, with optional ANSI 256 / truecolor.
 
 A Rust library (`terminal_artist`) and CLI (`tartist`).
 
