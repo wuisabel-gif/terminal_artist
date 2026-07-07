@@ -54,6 +54,10 @@ terminal_artist = { git = "https://github.com/wuisabel-gif/terminal_artist" }
 
 ## CLI
 
+```
+tartist <IMAGE> [OPTIONS]
+```
+
 ```bash
 tartist cat.png                          # ascii, 80 cols, to terminal
 tartist cat.png -w 120 -c truecolor      # colored
@@ -69,6 +73,8 @@ tartist loop.gif --once                  # just the first frame
 
 | Option | Meaning | Default |
 |---|---|---|
+| `<IMAGE>` | input image or GIF (PNG, JPEG, GIF, WebP, BMP, …) | required |
+| `-o, --output` | write to a file: `.svg` → scalable image, anything else → plain text | stdout |
 | `-w, --width` | output width in cells | `80` |
 | `-r, --renderer` | `ascii` \| `half` \| `braille` | `ascii` |
 | `-c, --color` | `none` \| `ansi256` \| `truecolor` | `none` |
