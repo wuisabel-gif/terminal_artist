@@ -61,6 +61,9 @@ pub struct Options {
     /// Midtone gamma. `< 1.0` brightens midtones (sparser art on white),
     /// `> 1.0` darkens them. `1.0` = no change.
     pub gamma: f32,
+    /// Downscale by darkest-pixel instead of averaging — keeps thin dark
+    /// strokes solid. For cartoons, sketches, and line art.
+    pub line_art: bool,
 }
 
 impl Default for Options {
@@ -76,6 +79,7 @@ impl Default for Options {
             auto_contrast: true,
             dither: true,
             gamma: 1.0,
+            line_art: false,
         }
     }
 }
@@ -212,11 +216,50 @@ fn resize(img: &DynamicImage, w: u32, h: u32) -> DynamicImage {
     img.resize_exact(w.max(1), h.max(1), FilterType::Triangle)
 }
 
+/// Downscale by keeping the *darkest* source pixel per cell. Averaging washes
+/// a thin black stroke out to grey; min-pooling keeps every cell the stroke
+/// touches fully dark — the difference between a cartoon face surviving or not.
+fn min_pool(img: &DynamicImage, w: u32, h: u32) -> DynamicImage {
+    let (iw, ih) = img.dimensions();
+    let (w, h) = (w.max(1), h.max(1));
+    let mut out = image::RgbaImage::new(w, h);
+    for y in 0..h {
+        for x in 0..w {
+            let (x0, x1) = (x * iw / w, ((x + 1) * iw / w).clamp(x * iw / w + 1, iw));
+            let (y0, y1) = (y * ih / h, ((y + 1) * ih / h).clamp(y * ih / h + 1, ih));
+            let mut best = img.get_pixel(x0, y0);
+            let mut best_l = luminance(best);
+            for sy in y0..y1 {
+                for sx in x0..x1 {
+                    let p = img.get_pixel(sx, sy);
+                    let l = luminance(p);
+                    if l < best_l {
+                        best_l = l;
+                        best = p;
+                    }
+                }
+            }
+            out.put_pixel(x, y, best);
+        }
+    }
+    DynamicImage::ImageRgba8(out)
+}
+
+/// Pick the downscaler that matches the source: averaging for photos,
+/// darkest-pixel for line art.
+fn downscale(img: &DynamicImage, w: u32, h: u32, opts: &Options) -> DynamicImage {
+    if opts.line_art {
+        min_pool(img, w, h)
+    } else {
+        resize(img, w, h)
+    }
+}
+
 fn render_ascii(img: &DynamicImage, opts: &Options) -> String {
     let ramp: Vec<char> = opts.glyphs.chars().collect();
     let (iw, ih) = img.dimensions();
     let h = ((opts.width as f32) * (ih as f32 / iw as f32) * opts.char_aspect).round() as u32;
-    let small = resize(img, opts.width, h);
+    let small = downscale(img, opts.width, h, opts);
     let (w, hh) = (small.width() as usize, small.height() as usize);
     let idxs = quantize_plane(lum_plane(&small, opts), w, hh, ramp.len(), opts.dither);
 
@@ -278,7 +321,7 @@ fn render_braille(img: &DynamicImage, opts: &Options) -> String {
     // Cells are 2 dots wide × 4 tall; dots are ~square when rows = width*aspect/2.
     let cols = opts.width;
     let rows = ((cols as f32) * (ih as f32 / iw as f32) / 2.0).round().max(1.0) as u32;
-    let small = resize(img, cols * 2, rows * 4);
+    let small = downscale(img, cols * 2, rows * 4, opts);
     let (pw, ph) = (small.width() as usize, small.height() as usize);
     // Dithered: quantize dots to on/off with error diffusion (photo-friendly).
     // Undithered: plain threshold cut (crisp, for line art).

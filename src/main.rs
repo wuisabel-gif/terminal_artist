@@ -61,6 +61,10 @@ struct Cli {
     #[arg(long, default_value_t = 1.0)]
     gamma: f32,
 
+    /// Darkest-pixel downscaling — keeps thin strokes solid (cartoons, line art).
+    #[arg(long)]
+    lineart: bool,
+
     /// Render only the first frame of a GIF.
     #[arg(long)]
     once: bool,
@@ -113,6 +117,7 @@ fn run(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
         auto_contrast: !cli.no_contrast,
         dither: !cli.no_dither,
         gamma: cli.gamma,
+        line_art: cli.lineart,
     };
 
     let is_gif = cli

@@ -26,7 +26,7 @@ A Rust library (`terminal_artist`) and CLI (`tartist`).
 ```bash
 tartist dog.png     -w 160 -g density --invert --gamma 0.55 -a 0.45 -o dog.svg
 tartist flower.png  -w 150 -g density -c truecolor -o flower.svg
-tartist charlie.png -w 74  -g " .013478T8B" --invert -o charlie.svg
+tartist charlie.png -w 90  -g " .:10" --invert --lineart --gamma 0.6 -a 0.62 -o charlie.svg
 ```
 
 Floyd–Steinberg dithering (on by default) turns smooth gradients into halftone
@@ -75,6 +75,7 @@ tartist loop.gif --once                  # just the first frame
 | `--no-contrast` | disable the auto brightness stretch | off (stretch on) |
 | `--no-dither` | disable Floyd–Steinberg dithering (crisp bands, good for line art) | off (dither on) |
 | `--gamma` | midtone gamma: `<1` brightens (sparser art), `>1` darkens | `1.0` |
+| `--lineart` | darkest-pixel downscaling — thin strokes stay solid (cartoons, sketches) | off |
 | `--once` | render only a GIF's first frame | off |
 | `-l, --loops` | animation loops, `0` = forever | `0` |
 
