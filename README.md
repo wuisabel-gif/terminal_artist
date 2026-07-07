@@ -5,6 +5,10 @@ dot-matrix, and emoji, with optional ANSI 256 / truecolor.
 
 A Rust library (`terminal_artist`) and CLI (`tartist`).
 
+Curious how it works? See [the algorithm](doc/algorithm.md) — downscaling
+(and why cartoons need a different one), auto-contrast, Floyd–Steinberg
+dithering, Braille bit-packing, and color mapping.
+
 ## Gallery
 
 <table>
